@@ -10,6 +10,12 @@ Drive your Claude Code sessions from your phone.
 
 Dispatch is a Claude Code plugin with a small relay that runs on your own computer. Your phone opens a page served by that relay, over [Tailscale](https://tailscale.com) or your local network. There is no account and no cloud service in between.
 
+<p>
+  <img src="docs/screenshots/chat.png" alt="A chat on the phone: Claude's messages, grouped tool calls, an image and the reply box" width="32%">
+  <img src="docs/screenshots/chats.png" alt="The menu: chats open on the computer, past chats, away mode and notifications" width="32%">
+  <img src="docs/screenshots/session.png" alt="The session panel: folder, branch, model, context use and cost" width="32%">
+</p>
+
 - **Follow along.** Messages as they stream, tool calls, subagents, the task list, and every past chat on the computer.
 - **Reply from anywhere.** Send messages with photos or files, answer questions, stop a turn, run slash commands, switch the model.
 - **Approve from your pocket.** Turn on away mode and permission prompts come to your phone first.

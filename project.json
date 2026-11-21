@@ -3,5 +3,6 @@
   "name": "Dispatch",
   "tagline": "Drive your Claude Code sessions from your phone.",
   "icon": "smartphone",
-  "demo": false
+  "demo": false,
+  "screenshot": "screenshot.jpg"
 }
