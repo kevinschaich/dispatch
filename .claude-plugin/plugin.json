@@ -1,0 +1,15 @@
+{
+  "name": "remote-control",
+  "version": "0.1.0",
+  "description": "Read and drive your Claude Code sessions from your phone, over Tailscale or your local network.",
+  "author": {
+    "name": "kevinschaich"
+  },
+  "license": "MIT",
+  "keywords": [
+    "remote",
+    "mobile",
+    "tailscale",
+    "phone"
+  ]
+}
