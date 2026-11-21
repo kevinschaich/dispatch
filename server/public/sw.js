@@ -9,7 +9,7 @@ self.addEventListener('push', event => {
     try {
       notice = await (await fetch('/api/push/latest', { cache: 'no-store' })).json()
     } catch {}
-    await self.registration.showNotification(notice.title || 'Claude Remote', {
+    await self.registration.showNotification(notice.title || 'Dispatch', {
       body: notice.body || 'Something needs your attention.',
       tag: notice.tag,
       icon: '/icon.png',

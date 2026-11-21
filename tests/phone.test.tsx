@@ -2,10 +2,10 @@ import type { On } from 'claude-code'
 import { expect, mock, test } from 'claude-code/testing'
 
 const ROW = {
-  plugin: 'remote-control',
+  plugin: 'dispatch',
   component: 'CommandOutput',
   requestId: 'row-1',
-  props: { command: 'phone', args: '', text: 'Claude Remote is ready.', isErrored: false },
+  props: { command: 'phone', args: '', text: 'Dispatch is ready.', isErrored: false },
 } as const
 
 // Nothing sits beneath the plugin in a test: these hooks stand for the engine

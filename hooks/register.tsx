@@ -105,11 +105,11 @@ async function call(
 ): Promise<Record<string, unknown>> {
   if (token === undefined) {
     const home = await $.env.get('HOME')
-    const raw = await $.fs.read(`${home}/.claude-remote/token`)
+    const raw = await $.fs.read(`${home}/.dispatch/token`)
     if (typeof raw !== 'string') throw new Error('no token')
     token = raw.trim()
   }
-  if (base === '') base = `http://127.0.0.1:${(await $.env.get('CLAUDE_REMOTE_PORT')) ?? DEFAULT_PORT}`
+  if (base === '') base = `http://127.0.0.1:${(await $.env.get('DISPATCH_PORT')) ?? DEFAULT_PORT}`
   const res = await $.http.fetch(`${base}${path}`, {
     method: body === undefined ? 'GET' : 'POST',
     headers: {
@@ -295,7 +295,7 @@ async function startRelay($: EngineInterface): Promise<void> {
   const { packageManagers } = await $.session.machine()
   const runtime = packageManagers.includes('node') ? 'node' : packageManagers.includes('bun') ? 'bun' : undefined
   if (runtime === undefined) {
-    $.ui.toast('Claude Remote needs Node.js 20 or newer (or Bun) on the PATH to start its relay.', { timeoutMs: 12000 })
+    $.ui.toast('Dispatch needs Node.js 24 or newer (or Bun) on the PATH to start its relay.', { timeoutMs: 12000 })
 
     return
   }
@@ -303,7 +303,7 @@ async function startRelay($: EngineInterface): Promise<void> {
     [
       '/bin/sh',
       '-c',
-      'mkdir -p "$HOME/.claude-remote" && (nohup "$0" "$1" >> "$HOME/.claude-remote/server.log" 2>&1 < /dev/null &)',
+      'mkdir -p "$HOME/.dispatch" && (nohup "$0" "$1" >> "$HOME/.dispatch/server.log" 2>&1 < /dev/null &)',
       runtime,
       `${$.plugin.root}/server/server.mjs`,
     ],
@@ -467,12 +467,12 @@ export const register: Register = on => {
     try {
       await hello($)
     } catch {
-      return { text: 'The Claude Remote relay is not running. It starts with the next session, or run `node server/cli.mjs start` in the plugin folder.' }
+      return { text: 'The Dispatch relay is not running. It starts with the next session, or run `node server/cli.mjs start` in the plugin folder.' }
     }
 
     // The address itself is drawn below and kept out of the transcript: on a
     // local network it carries the pairing key.
-    return { text: 'Claude Remote is ready. Scan the QR code with your phone to open this session there.' }
+    return { text: 'Dispatch is ready. Scan the QR code with your phone to open this session there.' }
   })
 
   on('ui.render', { component: 'CommandOutput', props: { command: 'phone' } }, ($, e, next) => {
@@ -486,7 +486,7 @@ export const register: Register = on => {
 
       return (
         <Box flexDirection="column">
-          <Text>Claude Remote: scan with your phone to open this session there.</Text>
+          <Text>Dispatch: scan with your phone to open this session there.</Text>
           {qrLines(remoteUrl).map(line => (
             <Text>{line}</Text>
           ))}
@@ -498,7 +498,7 @@ export const register: Register = on => {
 
     return (
       <Box flexDirection="column">
-        <Text>Claude Remote: scan with your phone to open this session there.</Text>
+        <Text>Dispatch: scan with your phone to open this session there.</Text>
         <Svg source={qrSvg(remoteUrl)} alt={`QR code for ${shown}`} width={232} height={232} />
         <Text dimColor>{note}</Text>
       </Box>

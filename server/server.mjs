@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Claude Remote relay: the mod pushes session events here and long-polls for
+// Dispatch relay: the mod pushes session events here and long-polls for
 // commands; the phone UI reads events over SSE and posts commands back.
 import { createServer } from 'node:http'
 import { execFileSync } from 'node:child_process'
@@ -11,8 +11,14 @@ import { homedir, networkInterfaces } from 'node:os'
 import { basename, dirname, extname, isAbsolute, join, resolve } from 'node:path'
 import { fileURLToPath } from 'node:url'
 
-const PORT = Number(process.env.CLAUDE_REMOTE_PORT ?? 7830)
-const DATA_DIR = process.env.CLAUDE_REMOTE_DATA ?? join(homedir(), '.claude-remote')
+// Node 24 or newer, as every project of this family requires; Bun runs it too.
+if (!process.versions.bun && Number(process.versions.node.split('.')[0]) < 24) {
+  console.error(`Dispatch needs Node.js 24 or newer; this is ${process.versions.node}.`)
+  process.exit(1)
+}
+
+const PORT = Number(process.env.DISPATCH_PORT ?? 7830)
+const DATA_DIR = process.env.DISPATCH_DATA ?? join(homedir(), '.dispatch')
 const TOKEN_PATH = join(DATA_DIR, 'token')
 const SESSIONS_DIR = join(DATA_DIR, 'sessions')
 const UPLOAD_DIR = join(DATA_DIR, 'uploads')
@@ -127,8 +133,8 @@ function lanAddress() {
   return found.sort((x, y) => x.rank - y.rank)[0]?.address ?? null
 }
 
-const WANTED_MODE = (process.env.CLAUDE_REMOTE_MODE ?? 'auto').toLowerCase()
-const extraLogins = (process.env.CLAUDE_REMOTE_ALLOW ?? '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
+const WANTED_MODE = (process.env.DISPATCH_MODE ?? 'auto').toLowerCase()
+const extraLogins = (process.env.DISPATCH_ALLOW ?? '').split(',').map(s => s.trim().toLowerCase()).filter(Boolean)
 const net = { mode: 'local', host: '127.0.0.1', tailnetUrl: '', allowed: new Set(extraLogins) }
 {
   const tail = WANTED_MODE === 'auto' || WANTED_MODE === 'tailscale' ? tailnet() : null
@@ -484,7 +490,7 @@ function vapidHeader(endpoint) {
   const claims = b64url(JSON.stringify({
     aud: new URL(endpoint).origin,
     exp: Math.floor(Date.now() / 1000) + 12 * 3600,
-    sub: 'mailto:claude-remote@localhost.invalid',
+    sub: 'mailto:dispatch@localhost.invalid',
   }))
   const signature = sign('sha256', Buffer.from(`${head}.${claims}`), { key: vapidKey, dsaEncoding: 'ieee-p1363' })
   return `vapid t=${head}.${claims}.${b64url(signature)}, k=${vapid.publicKey}`
@@ -579,7 +585,7 @@ function isAllowedViewer(req, url) {
     if (login && net.allowed.has(login)) return true
   }
   if (isLockedOut(req)) return false
-  const key = url.searchParams.get('key') ?? cookieOf(req, 'cr_key')
+  const key = url.searchParams.get('key') ?? cookieOf(req, 'dispatch_key')
   if (key) {
     if (sameText(key, PAIR_KEY)) return true
     countWrongKey(req)
@@ -769,7 +775,7 @@ async function handleApi(req, res, url) {
   }
   if (req.method === 'POST' && url.pathname === '/api/push/test') {
     const session = [...sessions.values()].sort((a, b) => b.updatedAt - a.updatedAt)[0]
-    if (session) notify(session, 'Claude Remote', 'Notifications are working.')
+    if (session) notify(session, 'Dispatch', 'Notifications are working.')
     return sendJson(res, 200, { ok: true, subscriptions: state.subscriptions.length })
   }
 
@@ -900,7 +906,7 @@ const server = createServer(async (req, res) => {
       const headers = { 'content-type': file[1], 'cache-control': 'no-cache' }
       // A pairing address leaves its key behind as a cookie, so the page can drop it from view.
       if (url.pathname === '/' && sameText(url.searchParams.get('key') ?? '', PAIR_KEY)) {
-        headers['set-cookie'] = `cr_key=${PAIR_KEY}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax`
+        headers['set-cookie'] = `dispatch_key=${PAIR_KEY}; Path=/; Max-Age=31536000; HttpOnly; SameSite=Lax`
       }
       res.writeHead(200, headers)
       return res.end(readFileSync(join(PUBLIC_DIR, file[0])))
@@ -917,6 +923,6 @@ server.on('error', error => {
   throw error
 })
 server.listen(PORT, net.host, () => {
-  console.log(`claude-remote (${net.mode}) listening on http://${net.host}:${PORT}`)
+  console.log(`dispatch (${net.mode}) listening on http://${net.host}:${PORT}`)
   console.log(net.mode === 'tailscale' ? `phone: ${net.tailnetUrl} for ${[...net.allowed].join(', ')}` : `phone: ${phoneUrl().replace(PAIR_KEY, '<pairing key>')}`)
 })

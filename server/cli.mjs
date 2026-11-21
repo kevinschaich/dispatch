@@ -1,5 +1,5 @@
 #!/usr/bin/env node
-// Runs and manages the Claude Remote relay outside a Claude session.
+// Runs and manages the Dispatch relay outside a Claude session.
 import { execFileSync } from 'node:child_process'
 import { existsSync, mkdirSync, readFileSync, rmSync, writeFileSync } from 'node:fs'
 import { homedir, platform, userInfo } from 'node:os'
@@ -8,13 +8,13 @@ import { fileURLToPath } from 'node:url'
 
 const HERE = dirname(fileURLToPath(import.meta.url))
 const SERVER = join(HERE, 'server.mjs')
-const DATA_DIR = process.env.CLAUDE_REMOTE_DATA ?? join(homedir(), '.claude-remote')
-const PORT = process.env.CLAUDE_REMOTE_PORT ?? '7830'
-const LABEL = 'com.claude-remote.server'
+const DATA_DIR = process.env.DISPATCH_DATA ?? join(homedir(), '.dispatch')
+const PORT = process.env.DISPATCH_PORT ?? '7830'
+const LABEL = 'com.dispatch.server'
 const PLIST = join(homedir(), 'Library', 'LaunchAgents', `${LABEL}.plist`)
-const UNIT = join(homedir(), '.config', 'systemd', 'user', 'claude-remote.service')
+const UNIT = join(homedir(), '.config', 'systemd', 'user', 'dispatch.service')
 // Settings the relay reads from its environment are carried into the service.
-const CARRIED = ['CLAUDE_REMOTE_PORT', 'CLAUDE_REMOTE_MODE', 'CLAUDE_REMOTE_ALLOW', 'CLAUDE_REMOTE_DATA'].filter(
+const CARRIED = ['DISPATCH_PORT', 'DISPATCH_MODE', 'DISPATCH_ALLOW', 'DISPATCH_DATA'].filter(
   name => process.env[name],
 )
 
@@ -86,7 +86,7 @@ ${env}
     const env = CARRIED.map(name => `Environment=${name}=${process.env[name]}`).join('\n')
     mkdirSync(dirname(UNIT), { recursive: true })
     writeFileSync(UNIT, `[Unit]
-Description=Claude Remote relay
+Description=Dispatch relay
 After=network-online.target
 
 [Service]
@@ -99,7 +99,7 @@ ${env}
 WantedBy=default.target
 `)
     run('systemctl', ['--user', 'daemon-reload'])
-    run('systemctl', ['--user', 'enable', '--now', 'claude-remote.service'])
+    run('systemctl', ['--user', 'enable', '--now', 'dispatch.service'])
     console.log(`Installed ${UNIT}. Run "loginctl enable-linger $USER" to keep it running while logged out.`)
   } else {
     throw new Error('the service installer supports macOS and Linux; run "start" under your own process manager')
@@ -111,7 +111,7 @@ function uninstallService() {
     quiet('launchctl', ['bootout', `gui/${userInfo().uid}/${LABEL}`])
     rmSync(PLIST, { force: true })
   } else if (platform() === 'linux') {
-    quiet('systemctl', ['--user', 'disable', '--now', 'claude-remote.service'])
+    quiet('systemctl', ['--user', 'disable', '--now', 'dispatch.service'])
     rmSync(UNIT, { force: true })
   }
   console.log('The relay service is removed. Its data stays in ' + DATA_DIR)
@@ -139,11 +139,11 @@ try {
   service uninstall   remove that service
   new-key             replace the pairing key (local-network mode)
 
-Environment: CLAUDE_REMOTE_PORT (7830), CLAUDE_REMOTE_MODE (auto, tailscale,
-lan, local), CLAUDE_REMOTE_ALLOW (extra tailnet logins, comma-separated).`)
+Environment: DISPATCH_PORT (7830), DISPATCH_MODE (auto, tailscale,
+lan, local), DISPATCH_ALLOW (extra tailnet logins, comma-separated).`)
     if (command && command !== 'help') process.exitCode = 1
   }
 } catch (error) {
-  console.error(existsSync(join(DATA_DIR, 'token')) ? `claude-remote: ${error.message}` : 'claude-remote: the relay has never run here; try "start"')
+  console.error(existsSync(join(DATA_DIR, 'token')) ? `dispatch: ${error.message}` : 'dispatch: the relay has never run here; try "start"')
   process.exitCode = 1
 }

@@ -1,14 +1,14 @@
 {
-  "name": "remote-control",
+  "name": "dispatch",
   "owner": {
     "name": "kevinschaich"
   },
   "plugins": [
     {
-      "name": "remote-control",
+      "name": "dispatch",
       "source": "./",
-      "description": "Read and drive your Claude Code sessions from your phone, over Tailscale or your local network."
+      "description": "Drive your Claude Code sessions from your phone."
     }
   ],
-  "description": "Read and drive your Claude Code sessions from your phone."
+  "description": "Drive your Claude Code sessions from your phone."
 }

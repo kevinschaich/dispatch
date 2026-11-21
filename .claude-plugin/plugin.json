@@ -1,7 +1,7 @@
 {
-  "name": "remote-control",
+  "name": "dispatch",
   "version": "0.1.0",
-  "description": "Read and drive your Claude Code sessions from your phone, over Tailscale or your local network.",
+  "description": "Drive your Claude Code sessions from your phone.",
   "author": {
     "name": "kevinschaich"
   },
@@ -11,5 +11,7 @@
     "mobile",
     "tailscale",
     "phone"
-  ]
+  ],
+  "homepage": "https://kevinschaich.com/project/dispatch/",
+  "repository": "https://github.com/kevinschaich/dispatch"
 }

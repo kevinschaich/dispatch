@@ -6,13 +6,13 @@
 <meta name="apple-mobile-web-app-capable" content="yes">
 <meta name="mobile-web-app-capable" content="yes">
 <meta name="apple-mobile-web-app-status-bar-style" content="black-translucent">
-<meta name="apple-mobile-web-app-title" content="Claude Remote">
+<meta name="apple-mobile-web-app-title" content="Dispatch">
 <meta name="theme-color" media="(prefers-color-scheme: dark)" content="#262624">
 <meta name="theme-color" media="(prefers-color-scheme: light)" content="#faf9f5">
 <link rel="manifest" href="/manifest.webmanifest">
 <link rel="icon" href="/icon.svg">
 <link rel="apple-touch-icon" href="/icon.png">
-<title>Claude Remote</title>
+<title>Dispatch</title>
 <style>
 :root {
   color-scheme: light dark;
@@ -237,7 +237,7 @@ body.drawer-open #drawer { transform: none; box-shadow: var(--shadow); }
 <div id="app">
   <header>
     <button class="icon-btn" id="menu" aria-label="Open chats menu"><svg viewBox="0 0 24 24"><path d="M4 7h16M4 12h16M4 17h10"/></svg></button>
-    <h1><span id="title">Claude Remote</span><span class="sub"><i class="dot" id="dot"></i><span id="subtitle"></span></span></h1>
+    <h1><span id="title">Dispatch</span><span class="sub"><i class="dot" id="dot"></i><span id="subtitle"></span></span></h1>
     <button class="icon-btn" id="gear" aria-label="Session details"><svg viewBox="0 0 24 24"><rect x="3.5" y="4.5" width="17" height="15" rx="3"/><path d="M14.5 4.5v15"/></svg></button>
   </header>
   <details id="plan" hidden><summary><span id="plan-count"></span><b id="plan-now"></b></summary><ol id="plan-list"></ol></details>
@@ -259,7 +259,7 @@ body.drawer-open #drawer { transform: none; box-shadow: var(--shadow); }
 </div>
 <div id="scrim"></div>
 <aside id="drawer" aria-label="Chats">
-  <div class="top"><b>Claude Remote</b><button class="icon-btn" id="drawer-close" aria-label="Close menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
+  <div class="top"><b>Dispatch</b><button class="icon-btn" id="drawer-close" aria-label="Close menu"><svg viewBox="0 0 24 24"><path d="M6 6l12 12M18 6L6 18"/></svg></button></div>
   <input class="find" id="find" type="search" placeholder="Search chats" aria-label="Search chats">
   <div class="list" id="chat-list"></div>
   <div class="foot" id="drawer-foot"></div>
@@ -480,7 +480,7 @@ $('find').oninput = drawDrawer
 function showEmpty(text) {
   const box = el('div', 'empty')
   const img = el('img'); img.src = '/icon.svg'; img.alt = ''
-  box.append(img, el('b', '', 'Claude Remote'), document.createTextNode(text))
+  box.append(img, el('b', '', 'Dispatch'), document.createTextNode(text))
   main.replaceChildren(box)
 }
 function openSession(id) {
@@ -1062,7 +1062,7 @@ if (new URLSearchParams(location.search).has('key')) {
 }
 // Start on the chat in the address, else the most recent one open on the desktop.
 resetChat()
-setHeader('Claude Remote', '', '')
+setHeader('Dispatch', '', '')
 const initial = new URLSearchParams(location.search).get('s')
 if (initial) openSession(initial)
 else api('/api/sessions').then(data => {
